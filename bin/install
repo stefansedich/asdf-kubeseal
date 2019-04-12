@@ -30,15 +30,14 @@ install_kubeseal() {
   rm -f $binary_path 2>/dev/null || true
 
   echo "Copying binary"
-  cp "${tmp_download_dir}/kubeseal-${version}-${platform}" ${binary_path}
+  cp "${tmp_download_dir}/kubeseal-${platform}" ${binary_path}
   chmod +x ${binary_path}
 }
 
 get_filename() {
-  local version="$1"
   local platform="$2"
 
-  echo "kubeseal-${version}-${platform}"
+  echo "kubeseal-${platform}"
 }
 
 get_download_url() {
@@ -46,7 +45,7 @@ get_download_url() {
   local platform="$2"
   local filename="$(get_filename $version $platform)"
 
-  echo "https://github.com/bitnami-labs/sealed-secrets/releases/download/${version}/${filename}"
+  echo "https://github.com/bitnami-labs/sealed-secrets/releases/download/v${version}/${filename}"
 }
 
 install_kubeseal $ASDF_INSTALL_TYPE $ASDF_INSTALL_VERSION $ASDF_INSTALL_PATH
