@@ -1,5 +1,7 @@
 # asdf-kubeseal
 
+[![Build Status](https://travis-ci.com/stefansedich/asdf-kubeseal.svg?branch=master)](https://travis-ci.com/stefansedich/asdf-kubeseal)
+
 [Kubeseal](https://github.com/bitnami-labs/sealed-secrets) plugin for the [asdf](https://github.com/asdf-vm/asdf) version manager.
 
 ## Install
