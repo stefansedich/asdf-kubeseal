@@ -3,7 +3,6 @@ before_script:
   - git clone https://github.com/asdf-vm/asdf.git
   - . asdf/asdf.sh
 script:
-  - bin/list-all
   - asdf plugin-add kubeseal ./
   - asdf list-all kubeseal
   - asdf plugin-test kubeseal ./ 'kubeseal --help' --asdf-tool-version 0.7.0
