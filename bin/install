@@ -29,15 +29,18 @@ install_kubeseal() {
   echo "Cleaning previous binaries"
   rm -f $binary_path 2>/dev/null || true
 
-  echo "Copying binary"
-  cp "${tmp_download_dir}/kubeseal-${platform}" ${binary_path}
+  echo "Unpacking and copying binary"
+  tar xz -C ${bin_install_path} -f $download_path kubeseal
   chmod +x ${binary_path}
+
+  echo "Cleaning up temp files"
+  rm -rf $tmp_download_dir
 }
 
 get_filename() {
   local platform="$2"
 
-  echo "kubeseal-${platform}"
+  echo "kubeseal-${version}-${platform}.tar.gz"
 }
 
 get_download_url() {
