@@ -7,10 +7,11 @@ install_kubeseal() {
   local install_type=$1
   local version=$2
   local install_path=$3
-  local platform="$(uname | tr '[:upper:]' '[:lower:]')-amd64"
+  local os="$(uname | tr '[:upper:]' '[:lower:]')"
+  local arch="$(uname -m | sed -e 's/x86_64/amd64/')"
   local bin_install_path="$install_path/bin"
   local binary_path="$bin_install_path/kubeseal"
-  local download_url=$(get_download_url $version $platform)
+  local download_url=$(get_download_url $version $os $arch)
 
   if [ "$TMPDIR" = "" ]; then
     local tmp_download_dir=$(mktemp -d -t kubeseal_XXXXXX)
@@ -18,7 +19,7 @@ install_kubeseal() {
     local tmp_download_dir=$TMPDIR
   fi
 
-  local download_path="$tmp_download_dir/$(get_filename $version $platform)"
+  local download_path="$tmp_download_dir/$(get_filename $version $os $arch)"
 
   echo "Downloading kubeseal from ${download_url} to ${download_path}"
   curl -f -Lo $download_path $download_url
@@ -30,20 +31,40 @@ install_kubeseal() {
   rm -f $binary_path 2>/dev/null || true
 
   echo "Copying binary"
-  cp "${tmp_download_dir}/kubeseal-${platform}" ${binary_path}
+  case "$download_path" in
+    *.tar.gz)
+      tar -x -C "$tmp_download_dir" -f "$download_path" kubeseal
+      cp "${tmp_download_dir}/kubeseal" ${binary_path}
+      ;;
+    *)
+      cp "${download_path}" ${binary_path}
+      ;;
+  esac
+
   chmod +x ${binary_path}
 }
 
 get_filename() {
-  local platform="$2"
+  local version="$1"
+  local os="$2"
+  local arch="$3"
+  local minor_version=$(echo "$version" | sed -E 's/[0-9]+\.([0-9]+)\.[0-9]+/\1/')
 
-  echo "kubeseal-${platform}"
+  if [ "$minor_version" -le 16 ]; then
+    echo "kubeseal-${os}-amd64"
+  elif [ "$version" = "0.17.0" ]; then
+    local Os="$(echo ${os:0:1} | tr '[:lower:]' '[:upper:]')${os:1}"
+    echo "sealed-secrets_${version}_${Os}_${arch}.tar.gz"
+  else
+    echo "kubeseal-${version}-${os}-${arch}.tar.gz"
+  fi
 }
 
 get_download_url() {
   local version="$1"
-  local platform="$2"
-  local filename="$(get_filename $version $platform)"
+  local os="$2"
+  local arch="$3"
+  local filename="$(get_filename $version $os $arch)"
 
   echo "https://github.com/bitnami-labs/sealed-secrets/releases/download/v${version}/${filename}"
 }
