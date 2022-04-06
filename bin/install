@@ -7,7 +7,9 @@ install_kubeseal() {
   local install_type=$1
   local version=$2
   local install_path=$3
-  local platform="$(uname | tr '[:upper:]' '[:lower:]')-amd64"
+  local os="$(uname | tr '[:upper:]' '[:lower:]')"
+  local arch="$(uname -m | sed -e 's/x86_64/amd64/')"
+  local platform="$os-$arch"
   local bin_install_path="$install_path/bin"
   local binary_path="$bin_install_path/kubeseal"
   local download_url=$(get_download_url $version $platform)
