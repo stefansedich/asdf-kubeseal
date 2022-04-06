@@ -30,14 +30,32 @@ install_kubeseal() {
   rm -f $binary_path 2>/dev/null || true
 
   echo "Copying binary"
-  cp "${tmp_download_dir}/kubeseal-${platform}" ${binary_path}
+  case "$download_path" in
+    *.tar.gz)
+      tar -x -C "$tmp_download_dir" -f "$download_path" kubeseal
+      cp "${tmp_download_dir}/kubeseal" ${binary_path}
+      ;;
+    *)
+      cp "${download_path}" ${binary_path}
+      ;;
+  esac
+
   chmod +x ${binary_path}
 }
 
 get_filename() {
   local platform="$2"
+  local version="$1"
+  local minor_version=$(echo "$version" | sed -E 's/[0-9]+\.([0-9]+)\.[0-9]+/\1/')
 
-  echo "kubeseal-${platform}"
+  if [ "$minor_version" -le 16 ]; then
+    echo "kubeseal-${platform}"
+  elif [ "$version" = "0.17.0" ]; then
+    local Platform="$(echo ${platform:0:1} | tr '[:lower:]' '[:upper:]')${platform:1}"
+    echo "sealed-secrets_${version}_${Platform/-/_}.tar.gz"
+  else
+    echo "kubeseal-${version}-${platform}.tar.gz"
+  fi
 }
 
 get_download_url() {
