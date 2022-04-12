@@ -14,5 +14,5 @@ function sort_versions() {
 }
 
 # Fetch all tag names of format "vX.Y.Z" or "X.Y.Z", and get only second column. Then remove all unnecesary characters.
-versions=$(eval $cmd | grep -oE "tag_name\": *\"v?\d+\.\d+\.\d+\"," | sed 's/tag_name\": *\"v//;s/\",//' | sort_versions)
+versions=$(eval $cmd | grep -oE "tag_name\": *\"v?[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+\"," | sed 's/tag_name\": *\"v//;s/\",//' | sort_versions)
 echo $versions
